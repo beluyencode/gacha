@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { NgParticlesModule } from 'ng-particles';
-
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -10,7 +10,8 @@ import { NgParticlesModule } from 'ng-particles';
   ],
   imports: [
     BrowserModule,
-    NgParticlesModule
+    NgParticlesModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

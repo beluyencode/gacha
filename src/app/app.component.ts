@@ -1,37 +1,55 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component } from '@angular/core';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { Engine, IOptions, RecursivePartial } from "tsparticles-engine";
 import { loadFull } from "tsparticles";
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject } from 'rxjs';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
-  fpPromise = FingerprintJS.load()
+export class AppComponent implements AfterViewInit {
+  fpPromise = FingerprintJS.load();
+  id = "";
   characters1 = [
     {
-      icon: "../assets/chim_canh_cut.jpg"
+      id: 1,
+      icon: "../assets/chim_canh_cut.png",
+      text: "Chim cánh cụt Tobi mũm mĩm!"
     }, {
-      icon: "../assets/co_tien.jpg"
+      id: 2,
+      icon: "../assets/co_tien.png",
+      text: "Thiên sứ xinh đẹp!"
     }, {
-      icon: "../assets/nguoi_danh_trong.jpg"
+      id: 3,
+      icon: "../assets/nguoi_danh_trong.png",
+      text: "Gấu Teddy năng động"
     }, {
-      icon: "../assets/nguoi_thoi_ken.jpg"
+      id: 4,
+      icon: "../assets/nguoi_thoi_ken.png",
+      text: "Chú lính chì mạnh mẽ!"
     },
   ]
   characters2 = [
     {
-      icon: "../assets/nguoi_tuyet.jpg"
+      id: 5,
+      icon: "../assets/nguoi_tuyet.png",
+      text: "Người tuyết đáng yêu!"
     }, {
-      icon: "../assets/ong_gia_noel.jpg"
+      id: 6,
+      icon: "../assets/ong_gia_noel.png",
+      text: "Ông già noel ngộ nghĩnh!"
     }, {
-      icon: "../assets/tuan_loc.jpg"
+      id: 7,
+      icon: "../assets/tuan_loc.png",
+      text: "Tuần lộc Hobe dễ thương!"
     }, {
-      icon: "../assets/vu_cong.jpg"
+      id: 8,
+      icon: "../assets/vu_cong.png",
+      text: "Cô vũ công xinh đẹp!"
     },
   ];
-  id = "tsparticles";
   particlesOptions: RecursivePartial<IOptions> = {
     "fullScreen": {
       "zIndex": 5
@@ -192,21 +210,55 @@ export class AppComponent {
       }
     }
   }
-
-
+  activeItem: any = null;
+  isUnlucky: any = false;
   isChoose = false;
   firework = false;
+  showChoose = true;
   shine = false;
-  constructor() {
+  sub: BehaviorSubject<any> = new BehaviorSubject(null);
+  constructor(private http: HttpClient) {
     this.fpPromise.then(fp => fp.get())
-      .then(result => console.log(result.visitorId))
+      .then(result => {
+        this.id = result.visitorId;
+        this.http.get("http://150.95.112.76:7898/api/v1/lucky", {
+          params: {
+            device_id: this.id
+          }
+        }).subscribe((res: any) => {
+          console.log(res);
+          if (res.data) {
+            this.isUnlucky = res.data.is_lucky;
+            if (this.isUnlucky) {
+              this.sub.next(res.data.type)
+            }
+          } else {
+            this.isUnlucky = null;
+          }
+        })
+      });
   }
 
-  choose(ev: any) {
+  ngAfterViewInit(): void {
+    this.sub.subscribe(res => {
+      if (res) {
+        const list = document.getElementsByClassName("character") as any;
+        [...(list || [])].forEach((ele: HTMLDivElement, index) => {
+          if (index + 1 === res) {
+            (ele.childNodes[0] as HTMLDivElement).click()
+          }
+        })
+      }
+    })
+  }
+
+  choose(ev: any, data: any) {
+    this.activeItem = data;
     const dom = ev.target as HTMLImageElement;
     const char = dom.cloneNode() as HTMLImageElement;
     const position = dom.getBoundingClientRect();
-    dom.parentElement?.appendChild(char)
+    dom.parentElement?.appendChild(char);
+    char.classList.add("no_hidden")
     char.classList.add("zoom");
     char.style.top = position.y + "px";
     char.style.left = position.x + "px";
@@ -223,9 +275,21 @@ export class AppComponent {
     const translateY = windowHeight / 2 - elementY;
 
     char.style.transform = `translate(${translateX}px, ${translateY}px) scale(2)`;
+    if (this.isUnlucky === null) {
+      console.log(data.id);
+
+      this.http.post("http://150.95.112.76:7898/api/v1/lucky", {
+        device_id: this.id,
+        type: data.id
+      }).subscribe(res => {
+        console.log(res);
+
+      })
+    }
     setTimeout(() => {
       this.firework = true;
       this.shine = true;
+      this.showChoose = false;
     }, 900);
   }
 

@@ -3,15 +3,49 @@
 <div class="shine" *ngIf="shine">
   <img src="../assets/shine.webp" alt="">
 </div>
+<div class="title" *ngIf="isUnlucky">
+  <h1>
+    <span>CHÚC</span>
+    &nbsp;
+    <span>MỪNG</span>
+    &nbsp;
+    <span>BẠN</span>
+    &nbsp;
+    <span>ĐÃ</span>
+    &nbsp;
+    <span>TRỞ</span>
+    &nbsp;
+    <span>THÀNH</span>
+    &nbsp;
+    <span>NHÂN</span>
+    &nbsp;
+    <span>VẬT</span>
+    &nbsp;
+    <span>MAY</span>
+    &nbsp;
+    <span>MẮN</span>
+    &nbsp;
+    <span>ĐƯỢC</span>
+    &nbsp;
+    <span>CHỌN</span>
+  </h1>
+</div>
+<div class="title" *ngIf="shine &&activeItem && !isUnlucky ">
+  Xin chào {{activeItem?.text}} <br>
+</div>
+<div class="title_bottom" *ngIf="shine">
+  Hãy cùng chúng mình khởi động dây chuyền sản xuất nhà máy quà tặng Toyderland Vincom Retail để kích hoạt thắp sáng cây
+  thông Noel tại Vincom Ocean Park 2023 nhé!
+</div>
 <div class="main">
-  <div class="choose">
+  <div class="choose" [ngClass]="!showChoose ? 'hidden':''">
     <div class="row">
-      <div class="character" *ngFor="let char of characters1" (click)="choose($event)">
+      <div class="character" *ngFor="let char of characters1" (click)="choose($event, char)">
         <img [src]="char.icon" alt="">
       </div>
     </div>
     <div class="row">
-      <div class="character" *ngFor="let char of characters2" (click)="choose($event)">
+      <div class="character" *ngFor="let char of characters2" (click)="choose($event, char)">
         <img [src]="char.icon" alt="">
       </div>
     </div>
