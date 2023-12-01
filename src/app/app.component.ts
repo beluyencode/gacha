@@ -24,7 +24,7 @@ export class AppComponent implements AfterViewInit {
     }, {
       id: 3,
       icon: "../assets/nguoi_danh_trong.png",
-      text: "Gấu Teddy năng động"
+      text: "Gấu Teddy năng động!"
     }, {
       id: 4,
       icon: "../assets/nguoi_thoi_ken.png",
@@ -39,11 +39,11 @@ export class AppComponent implements AfterViewInit {
     }, {
       id: 6,
       icon: "../assets/ong_gia_noel.png",
-      text: "Ông già noel ngộ nghĩnh!"
+      text: "Ông già Noel ngộ nghĩnh!"
     }, {
       id: 7,
       icon: "../assets/tuan_loc.png",
-      text: "Tuần lộc Hobe dễ thương!"
+      text: "Tuần lộc Hope dễ thương!"
     }, {
       id: 8,
       icon: "../assets/vu_cong.png",
@@ -274,7 +274,7 @@ export class AppComponent implements AfterViewInit {
     const translateX = windowWidth / 2 - elementX;
     const translateY = windowHeight / 2 - elementY;
 
-    char.style.transform = `translate(${translateX}px, ${translateY}px) scale(2)`;
+    char.style.transform = `translate(${translateX}px, ${translateY}px) scale(3)`;
     if (this.isUnlucky === null) {
       console.log(data.id);
 
