@@ -1,4 +1,4 @@
-import { AfterViewInit, Component } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { Engine, IOptions, RecursivePartial } from "tsparticles-engine";
 import { loadFull } from "tsparticles";
@@ -9,47 +9,9 @@ import { BehaviorSubject } from 'rxjs';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent implements AfterViewInit, OnInit {
   fpPromise = FingerprintJS.load();
   id = "";
-  characters1 = [
-    {
-      id: 1,
-      icon: "../assets/chim_canh_cut.png",
-      text: "Chim cánh cụt Tobi mũm mĩm!"
-    }, {
-      id: 2,
-      icon: "../assets/co_tien.png",
-      text: "Thiên sứ xinh đẹp!"
-    }, {
-      id: 3,
-      icon: "../assets/nguoi_danh_trong.png",
-      text: "Gấu Teddy năng động!"
-    }, {
-      id: 4,
-      icon: "../assets/nguoi_thoi_ken.png",
-      text: "Chú lính chì mạnh mẽ!"
-    },
-  ]
-  characters2 = [
-    {
-      id: 5,
-      icon: "../assets/nguoi_tuyet.png",
-      text: "Người tuyết đáng yêu!"
-    }, {
-      id: 6,
-      icon: "../assets/ong_gia_noel.png",
-      text: "Ông già Noel ngộ nghĩnh!"
-    }, {
-      id: 7,
-      icon: "../assets/tuan_loc.png",
-      text: "Tuần lộc Hope dễ thương!"
-    }, {
-      id: 8,
-      icon: "../assets/vu_cong.png",
-      text: "Cô vũ công xinh đẹp!"
-    },
-  ];
   particlesOptions: RecursivePartial<IOptions> = {
     "fullScreen": {
       "zIndex": 5
@@ -213,84 +175,82 @@ export class AppComponent implements AfterViewInit {
   activeItem: any = null;
   isUnlucky: any = false;
   isChoose = false;
+  data: any = null;
   firework = false;
   showChoose = true;
   shine = false;
+  test = 0;
+  ringing: any;
+  interval: any;
+  isHaveData = false;
   sub: BehaviorSubject<any> = new BehaviorSubject(null);
   constructor(private http: HttpClient) {
     this.fpPromise.then(fp => fp.get())
       .then(result => {
-        this.id = result.visitorId;
-        this.http.get("http://150.95.112.76:7898/api/v1/lucky", {
-          params: {
-            device_id: this.id
-          }
-        }).subscribe((res: any) => {
-          console.log(res);
-          if (res.data) {
-            this.isUnlucky = res.data.is_lucky;
-            if (this.isUnlucky) {
-              this.sub.next(res.data.type)
-            }
-          } else {
-            this.isUnlucky = null;
+        const id = localStorage.getItem("id");
+        if (id) {
+          this.id = id;
+        } else {
+          localStorage.setItem("id", result.visitorId);
+          this.id = result.visitorId;
+        }
+        this.http.get(" https://noel.sqr.vn/api/prize/check/" + this.id).subscribe((res: any) => {
+          if (res?.data) {
+            this.data = res.data;
+            this.animation();
           }
         })
       });
   }
 
-  ngAfterViewInit(): void {
-    this.sub.subscribe(res => {
-      if (res) {
-        const list = document.getElementsByClassName("character") as any;
-        [...(list || [])].forEach((ele: HTMLDivElement, index) => {
-          if (index + 1 === res) {
-            (ele.childNodes[0] as HTMLDivElement).click()
-          }
-        })
+  ngOnInit() {
+    this.ringing = () => {
+      if (!this.isHaveData) {
+        this.http.post(" https://noel.sqr.vn/api/prize/shaking/" + this.id, {}).subscribe((res: any) => {
+          if (res?.data) {
+            this.isHaveData = true;
+            document.getElementsByClassName("bell")[0].classList.add("ringing");
+            const audioElement = document.getElementById("audio")! as HTMLAudioElement;
+            audioElement.load();
+            audioElement.play().catch(() => {
+              document.addEventListener('click', () => {
+                audioElement.play();
+              }, { once: true });
+            });
+            const a = setInterval(() => {
+              if (audioElement.paused) {
+                audioElement.play().catch(() => {
+                  document.addEventListener('click', () => {
+                    audioElement.play();
+                  }, { once: true });
+                });
+              }
+            }, 200);
+            if (window?.navigator?.vibrate) {
+              window.navigator.vibrate(15000);
+            }
+            setTimeout(() => {
+              this.data = res.data;
+              this.animation();
+              clearInterval(a);
+            }, 15000);
+            clearInterval(this.interval);
+          };
+        });
       }
-    })
+    }
+
   }
 
-  choose(ev: any, data: any) {
-    this.activeItem = data;
-    const dom = ev.target as HTMLImageElement;
-    const char = dom.cloneNode() as HTMLImageElement;
-    const position = dom.getBoundingClientRect();
-    dom.parentElement?.appendChild(char);
-    char.classList.add("no_hidden")
-    char.classList.add("zoom");
-    char.style.top = position.y + "px";
-    char.style.left = position.x + "px";
-    char.style.width = position.width + "px";
-    char.style.height = position.height + "px";
-    this.isChoose = true;
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
-
-    const elementX = position.left + position.width / 2;
-    const elementY = position.top + position.height / 2;
-
-    const translateX = windowWidth / 2 - elementX;
-    const translateY = windowHeight / 2 - elementY;
-
-    char.style.transform = `translate(${translateX}px, ${translateY}px) scale(3)`;
-    if (this.isUnlucky === null) {
-      console.log(data.id);
-
-      this.http.post("http://150.95.112.76:7898/api/v1/lucky", {
-        device_id: this.id,
-        type: data.id
-      }).subscribe(res => {
-        console.log(res);
-
-      })
-    }
+  animation() {
+    this.firework = true;
     setTimeout(() => {
-      this.firework = true;
-      this.shine = true;
-      this.showChoose = false;
-    }, 900);
+      this.firework = false;
+    }, 10000);
+  }
+
+  ngAfterViewInit(): void {
+
   }
 
   async particlesInit(engine: Engine): Promise<void> {

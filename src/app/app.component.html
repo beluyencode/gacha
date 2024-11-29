@@ -3,57 +3,85 @@
 <div class="shine" *ngIf="shine">
   <img src="../assets/shine.webp" alt="">
 </div>
-<div class="title" *ngIf="isUnlucky">
-  <h1>
-    <span>CHÚC</span>
-    &nbsp;
-    <span>MỪNG</span>
-    &nbsp;
-    <span>BẠN</span>
-    &nbsp;
-    <span>ĐÃ</span>
-    &nbsp;
-    <span>TRỞ</span>
-    &nbsp;
-    <span>THÀNH</span>
-    &nbsp;
-    <span>NHÂN</span>
-    &nbsp;
-    <span>VẬT</span>
-    &nbsp;
-    <span>MAY</span>
-    &nbsp;
-    <span>MẮN</span>
-    &nbsp;
-    <span>ĐƯỢC</span>
-    &nbsp;
-    <span>CHỌN</span>
-  </h1>
+<div class="main" *ngIf="!this.data">
+  <div class="title_web">
+    <p class="VINCOM">VINCOM</p>
+    <img class="title" src="../assets/title-removebg-preview.png" alt="">
+    <p class="lucky_title">
+      Lucky Bell Ringing
+    </p>
+  </div>
+  <img class="bell" src="../assets/QR-2.png" alt="" (touchstart)="ringing()" />
+  <p class="note">
+    Hẫy giơ điện thoại lên cao, lắc chuông và
+    <br>
+    đón nhận những phần quà may mắn
+  </p>
 </div>
-<div class="title" *ngIf="shine &&activeItem && !isUnlucky ">
-  Xin chào {{activeItem?.text}} <br>
-</div>
-<div class="title_bottom" *ngIf="shine">
-  Hãy cùng chúng mình khởi động <br> dây chuyền sản xuất nhà máy quà tặng <br> Toyderland Vincom Retail để kích hoạt
-  <br>thắp sáng cây
-  thông Noel tại <br> Vincom Ocean Park 2023 nhé!
-</div>
-<div class="main">
-  <div class="choose" [ngClass]="!showChoose ? 'hidden':''">
-    <div class="row">
-      <div class="character" *ngFor="let char of characters1" (click)="choose($event, char)">
-        <img [src]="char.icon" alt="">
-      </div>
-    </div>
-    <div class="row">
-      <div class="character" *ngFor="let char of characters2" (click)="choose($event, char)">
-        <img [src]="char.icon" alt="">
-      </div>
-    </div>
-    <div class="bg" *ngIf="isChoose">
-    </div>
+<div class="main unluck" *ngIf="this.data?.prize === ''">
+  <div class="title_web">
+    <p class="VINCOM">VINCOM</p>
+    <img class="title" src="../assets/title-removebg-preview.png" alt="">
+    <p class="lucky_title">
+      Lucky Bell Ringing
+    </p>
+  </div>
+  <p class="title1">
+    CẢM ƠN BẠN ĐÃ THAM GIA CHƯƠNG TRÌNH
+  </p>
+  <p class="title2">
+    Vincom chúc bạn một mùa <br>
+    Giáng sinh an lành, ấm áp <br>
+    bên những người thân yêu
+  </p>
+  <div class="footer">
+    <img src="../assets/left-removebg-preview.png" alt="">
+    <img src="../assets/right-removebg-preview.png" alt="">
   </div>
 </div>
+<div class="main luckVotcher" *ngIf="this.data?.prize === 'voucher'">
+  <div class="title_web">
+    <p class="VINCOM">VINCOM</p>
+    <img class="title" src="../assets/title-removebg-preview.png" alt="">
+    <p class="lucky_title">
+      Lucky Bell Ringing
+    </p>
+  </div>
+  <img src="../assets/voucher.png" alt="" style="height: 350px;">
+  <div class="footer">
+    <p class="title2">
+      CHÚC MỪNG BẠN LỌT VÀO TOP 5% <br>
+      kHÁCH HÀNG MAY MẮN NHẤT
+    </p>
+    <p class="title2">
+      VINCOM XIN GỬI TẶNG BẠN 01 VOUCHER <br>
+      MUA SẮM TẠI VINCOM SMART CITY
+    </p>
+  </div>
+</div>
+<div class="main luckTicket" *ngIf="this.data?.prize === 'ticket'">
+  <div class="title_web">
+    <p class="VINCOM">VINCOM</p>
+    <img class="title" src="../assets/title-removebg-preview.png" alt="">
+    <p class="lucky_title">
+      Lucky Bell Ringing
+    </p>
+  </div>
+  <img src="../assets/ticket.png" alt="" style="height: 350px;">
+  <div class="footer">
+    <p class="title2">
+      CHÚC MỪNG BẠN LỌT VÀO TOP 5% <br>
+      kHÁCH HÀNG MAY MẮN NHẤT
+    </p>
+    <p class="title2">
+      VINCOM XIN GỬI TẶNG BẠN 01 CẶP VÉ XEM PHIM <br>
+      TẠI CGV TRẦN DUY HƯNG
+    </p>
+  </div>
+</div>
+<audio id="audio">
+  <source src="https://dev-mywedding-api-831513078501.asia-southeast1.run.app/tool/bell_ring.mp3" type="audio/mpeg">
+</audio>
 <div class="snow_div">
   <div class="snow"></div>
   <div class="snow"></div>
